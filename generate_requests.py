@@ -63,6 +63,12 @@ class GenerateRequests:
     @staticmethod
     def generate_id_query(table, id_name, id_value):
         return f"SELECT * FROM {table} WHERE {id_name}={id_value}"
+    
+    @staticmethod
+    def show_details(table_name, id_name, the_min, the_max, batch_size):
+        return (f"downloading {table_name} by {id_name}\n"
+                f"from {float(the_min)/(10**6)}m to {float(the_max)/10**6}m\n"
+                f"in batches of {float(batch_size)/10**6}m\n")
 
 if __name__ == "__main__":
     if len(sys.argv) == 6:
@@ -75,6 +81,16 @@ if __name__ == "__main__":
         the_max = sys.argv[4]
         batch_size = sys.argv[5]
         
+        print(
+            GenerateRequests.show_details(
+                table_name,
+                id_name,
+                the_min,
+                the_max,
+                batch_size
+            )
+        )
+        
         filename = GenerateRequests.go(
             table_name,
             id_name,
@@ -85,7 +101,7 @@ if __name__ == "__main__":
         print(f"generated {filename}")
         print(f"running {filename}")
         subprocess.run(['chmod', '+x', os.path.abspath(filename)])
-        subprocess.run(['/usr/bin/env', 'bash', os.path.abspath(filename)}])
+        subprocess.run(['/usr/bin/env', 'bash', os.path.abspath(filename)])
         print(f"finished {filename}") 
         print(f"deleting {filename}")
         subprocess.run(['rm', os.path.abspath(filename)])
