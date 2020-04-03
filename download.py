@@ -4,7 +4,7 @@ import sys
 import subprocess
 import os
 
-class GenerateRequests:
+class Download:
     
     @staticmethod
     def go(table_name, id_name, the_min, the_max, batch_size):
@@ -12,16 +12,16 @@ class GenerateRequests:
         # dr1.dr1p1_master
         filename = f"download_{table_name}_{the_min}-{the_max}.sh"
         with open(filename, 'w+') as f:
-            for batch_min, batch_max in GenerateRequests.generate_batch_queue(the_min, the_max, batch_size):
+            for batch_min, batch_max in Download.generate_batch_queue(the_min, the_max, batch_size):
                 f.write(
-                    GenerateRequests.generate_command(
+                    Download.generate_command(
                         URL,
-                        GenerateRequests.generate_range_query(table_name,
+                        Download.generate_range_query(table_name,
                                                             id_name,
                                                             batch_min,
                                                             batch_max
                         ),
-                        GenerateRequests.generate_filename(table_name, batch_min, batch_max)
+                        Download.generate_filename(table_name, batch_min, batch_max)
                     )
                 )
         return filename
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         batch_size = sys.argv[5]
         
         print(
-            GenerateRequests.show_details(
+            Download.show_details(
                 table_name,
                 id_name,
                 the_min,
@@ -91,7 +91,7 @@ if __name__ == "__main__":
             )
         )
         
-        filename = GenerateRequests.go(
+        filename = Download.go(
             table_name,
             id_name,
             int(the_min),
