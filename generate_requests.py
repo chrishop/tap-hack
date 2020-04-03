@@ -1,23 +1,30 @@
+#!/usr/bin/env python3
+
+import sys
+import subprocess
+import os
 
 class GenerateRequests:
     
     @staticmethod
-    def go():
+    def go(table_name, id_name, the_min, the_max, batch_size):
         URL = "http://api.skymapper.nci.org.au/public/tap"
-        TABLE_NAME = "dr1.dr1p1_master"
-        with open("download_dr1p1_master.sh", 'w+') as f:
-            for batch_min, batch_max in GenerateRequests.generate_batch_queue(0, 10000000, 500000):
+        # dr1.dr1p1_master
+        filename = f"download_{table_name}_{the_min}-{the_max}.sh"
+        with open(filename, 'w+') as f:
+            for batch_min, batch_max in GenerateRequests.generate_batch_queue(the_min, the_max, batch_size):
                 f.write(
                     GenerateRequests.generate_command(
                         URL,
-                        GenerateRequests.generate_range_query(TABLE_NAME,
-                                                            "object_id",
+                        GenerateRequests.generate_range_query(table_name,
+                                                            id_name,
                                                             batch_min,
                                                             batch_max
                         ),
-                        GenerateRequests.generate_filename(TABLE_NAME, batch_min, batch_max)
+                        GenerateRequests.generate_filename(table_name, batch_min, batch_max)
                     )
                 )
+        return filename
         
     
     @staticmethod
@@ -46,7 +53,7 @@ class GenerateRequests:
     
     @staticmethod
     def generate_filename(table, batch_min, batch_max):
-        return f"{table}_{batch_min}-{batch_max}.fits"
+        return f"results/{table}_{batch_min}-{batch_max}.fits"
 
     @staticmethod
     def generate_range_query(table, id_name, batch_min, batch_max):
@@ -58,4 +65,31 @@ class GenerateRequests:
         return f"SELECT * FROM {table} WHERE {id_name}={id_value}"
 
 if __name__ == "__main__":
-    GenerateRequests.go()
+    if len(sys.argv) == 6:
+        if subprocess.run(['mkdir', 'results']).returncode == 0:
+            print("created 'results/'")
+        
+        table_name = sys.argv[1]
+        id_name = sys.argv[2]
+        the_min = sys.argv[3]
+        the_max = sys.argv[4]
+        batch_size = sys.argv[5]
+        
+        filename = GenerateRequests.go(
+            table_name,
+            id_name,
+            int(the_min),
+            int(the_max),
+            int(batch_size)
+        )
+        print(f"generated {filename}")
+        print(f"running {filename}")
+        subprocess.run(['chmod', '+x', os.path.abspath(filename)])
+        subprocess.run(['/usr/bin/env', 'bash', os.path.abspath(filename)}])
+        print(f"finished {filename}") 
+        print(f"deleting {filename}")
+        subprocess.run(['rm', os.path.abspath(filename)])
+    else:
+        print("don't think you have the right amount of arguments")
+        
+   
