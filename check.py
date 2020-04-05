@@ -16,7 +16,6 @@ def check(table, the_min, the_max, batch_size):
     return not_present
 
 def show(not_present):
-    print(not_present)
     if not_present == []:
         print("Great :) no files missing!")
     else:
