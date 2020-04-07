@@ -24,6 +24,7 @@ class Download:
                         Download.generate_filename(table_name, batch_min, batch_max)
                     )
                 )
+                f.write("date\n")
         return filename
         
     
