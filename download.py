@@ -30,7 +30,8 @@ class Download:
     
     @staticmethod
     def generate_command(url, query, filepath):
-        return(f"java -jar stilts.jar "
+        return(f"timeout 3600 "
+                f"java -jar stilts.jar "
                 f"tapquery tapurl='{url}' "
                 f"adql='{query}' "
                 f"out='{filepath}'\n")
@@ -42,7 +43,7 @@ class Download:
         batch_max = the_min
 
         iterations = int((the_max - the_min) / batch_size)
-        for i in range(iterations):
+        for _ in range(iterations):
             batch_min = batch_max
             batch_max = batch_max + batch_size
             queue.append([batch_min, batch_max])
