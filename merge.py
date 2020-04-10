@@ -5,12 +5,12 @@ import sys, subprocess, os
 def merge(table_name, the_min, the_max,batch_size, out_filename):
     merge_queue = generate_batch_queue(int(the_min), int(the_max), int(batch_size))
     
-    first = merge_queue.pop(0)
-    second = merge_queue.pop(0)
-    first_file = generate_filename(table_name, first[0], first[1])
-    second_file = generate_filename(table_name, second[0], second[1])
-    run_command(first_file, second_file, "results/" + out_filename)
-    print(show_details(table_name, first[0], second[1], out_filename))
+    first_elem = merge_queue.pop(0)
+    rename(
+        generate_filename(table_name, first_elem[0], first_elem[1]),
+        "results/" + out_filename
+    )
+    print(show_details(table_name, first_elem[0], first_elem[1], out_filename))
     
     
     while len(merge_queue) > 0:
@@ -25,7 +25,7 @@ def merge(table_name, the_min, the_max,batch_size, out_filename):
         
 
 def generate_batch_queue(the_min, the_max, batch_size):
-        queue = [[the_min, the_min]]
+        queue = []
         batch_min = the_min
         batch_max = the_min
 
@@ -48,11 +48,12 @@ def run_command(merge_file1, merge_file2, out_file):
                     "stilts.jar", "tcat",
                     f"in={merge_file1}", f"in={merge_file2}", f"out={out_file}"])
     
-        
+def rename(old_name, new_name):
+    subprocess.run(["mv", old_name, new_name])
     
 def show_details(table_name, the_min, the_max, out_file):
         return (f"Merging {table_name} "
-                f"Range {float(the_min)/(10**6)}m 0 {float(the_max)/10**6}m "
+                f"Range {float(the_min)/(10**6)}m - {float(the_max)/10**6}m "
                 f"into {out_file} ")
     
 if __name__ == "__main__":
