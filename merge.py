@@ -2,7 +2,7 @@
 
 import sys, subprocess, os
 
-def merge(table_name, the_min, the_max,batch_size, out_filename):
+def merge(table_name, the_min, the_max, batch_size, out_filename):
     merge_queue = generate_batch_queue(int(the_min), int(the_max), int(batch_size))
     
     first_elem = merge_queue.pop(0)
